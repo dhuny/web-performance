@@ -1,0 +1,20 @@
+---
+
+- name: uninstall useless packages
+  apt:
+    pkg: '{{ web_client_uninstall_packages }}'
+    state: 'absent'
+    purge: 'yes'
+  when: 'web_client_uninstall_packages is defined'
+  register: packages_uninstalled
+  until: packages_uninstalled is succeeded
+
+- name: install packages
+  apt:
+    pkg: '{{ web_client_install_packages }}'
+    state: 'present'
+    update_cache: 'yes'
+    autoremove: 'yes'
+  when: 'web_client_install_packages is defined'
+  register: packages_installed
+  until: packages_installed is succeeded

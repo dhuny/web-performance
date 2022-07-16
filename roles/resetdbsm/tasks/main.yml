@@ -1,0 +1,8 @@
+---
+ 
+- name: Reset DB and purge Moodle cache by calling the script via web. This will take at least 3 minutes to execute.
+  shell: wget http://rpi64box.home/admin/cli/resetdb-sm.php
+  async: 240
+  poll: 3
+  become: yes
+  become_user: "{{client_username}}" 

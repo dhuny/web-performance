@@ -1,0 +1,26 @@
+---
+# Install Phpsysinfo
+  
+
+- name: Unarchive Phpsysinfo https://github.com/phpsysinfo/phpsysinfo/archive/v3.3.2.zip
+  unarchive:
+    src: https://github.com/phpsysinfo/phpsysinfo/archive/v3.3.2.zip
+    dest: {{ web_client_default_root_dir }}
+    remote_src: yes
+  become: yes
+  become_user: moodlebox
+  
+  
+- name: Move phpsysinfo-3.3.2 to phpsysinfo
+  shell: 'mv {{ web_client_default_root_dir }}/phpsysinfo-3.3.2 {{ web_client_default_root_dir }}/phpsysinfo'
+  
+- name: Create the  phpsysinfo.ini file
+  shell: 'mv {{ web_client_default_root_dir }}/phpsysinfo/phpsysinfo.ini.new {{ web_client_default_root_dir }}/phpsysinfo/phpsysinfo.ini'
+  
+  
+- name: Change permission and ownership of http://{{client_ip_address}}/phpsysinfo to www-data
+  shell: 'sudo chown -R www-data:www-data {{web_client_default_root_dir}}/phpsysinfo'
+  async: 20
+  poll: 4
+  ignore_errors: false
+  

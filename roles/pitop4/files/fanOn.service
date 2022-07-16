@@ -1,0 +1,13 @@
+[Unit]
+Description=Start GPIO fan for PiTop4
+#After=network.target
+
+[Service]
+Type=simple
+User=moodlebox
+WorkingDirectory=/home/moodlebox
+ExecStart=/home/moodlebox/fanOn
+#Restart=on-failure # or always, on-abort, etc
+
+[Install]
+WantedBy=multi-user.target

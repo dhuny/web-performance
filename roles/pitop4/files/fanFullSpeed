@@ -1,0 +1,1 @@
+gpio mode 26 pwm && gpio pwm-ms && gpio pwmc 22 && gpio pwmr 100 && gpio pwm 26 100

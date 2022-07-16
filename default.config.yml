@@ -1,0 +1,98 @@
+---
+
+# server hostname is the location of the server. usually rpi64box.home
+# If the server and the clients are connected via LAN and the test will be mainly for LAN
+# In that case, on this client edit the /etc/hosts and add the IP of the server followed by rpi64box.home
+
+server_hostname: 'rpi64box.home'
+
+# Server disk storage system
+# Type of disk storage used by server. If SD-card used mmcblk and if ssd use sda.
+
+storage_device: 'sda'
+
+
+# Moodlebox test Operating system
+# pi-32-SD | pi-64-SD | pi-32-SSD | pi-64-SSD | ubuntu-32-SD | ubuntu-32-SSD | ubuntu-64-SD | ubuntu-64-SSD
+# Mains  pi-32-SD |  pi-32-SSD | pi-64-SSD | ubuntu-64-SSD | ubuntu-64-SSD-Apache
+# Maintain same value as in configuration present on Server (RPI64Box)
+
+platform_moodle: 'ubuntu-64-SSD'
+
+# custom graph is set for MMCblock or SDA. The values are:  customgraph.txt | customgraph-sda.txt
+# If you are running the codes from SD card use customgraph.txt else use the sda one.
+
+custom_graph: 'customgraph-{{platform_moodle}}.txt'
+
+# PHP version is the most current used by system 32-bit uses 7.3 and 64-bit has 7.4.
+
+php_version: '7.4'
+
+# return the name of the network. This value can be obtained from shell using IP a or ifconfig.
+# For LAN network the value is usually eth0 and for wireless LAN the value is usually wlan0. 
+# The last character is a digit (Zero)
+
+network_type: 'eth0'
+
+# maximum network transmission rate in KB/s for selected network.  iperf return 72.2 Mbits/s same was converted into KB/s. 
+#Now using 57.0 Mbits/s. The value for WLAN was set to 7296.
+
+net_tx_max: '119424'  # for LAN it was considered as 933Mbps. A measured value of 119424 kbits/s tx max unit is on KB/s
+
+# with a throughput of 120 the maximum number of requests per second is 3.11/s and with 240 it shall be 6.22/s. MM can handle only up to 2.8 requests/s
+
+throughput: '180'
+
+# client ip address. The value of the client IP or this machine where the test will be running. 
+# The IP addresss can be obtained from ip a or ifconfig commands.
+
+client_ip_address: '192.168.0.30'
+
+# The client main OS user. This is the user where the client is running.If ubuntu is used, the value is ubuntu. 
+# If rpi64box is used the value will be rpi64box, if moodlebox is used the value will be moodlebox
+
+client_username: 'ubuntu'
+
+# Path of saved files inside jmeter script. Leave as jmetertests. DO not change.
+path_to_save_jmeter_results: '~/jmetertests'
+jmeter_results_folder: 'jmetertests'
+
+
+# Apache JMeter version to use. The version 5.0 was used.
+
+Apache_Jmeter_Version: 'apache-jmeter-5.5'
+
+#The apache Jmeter can be downloaded from its official Apache Archive on https://archive.apache.org/dist/jmeter/binaries/
+
+Apache_Jmeter_Source: 'https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.5.zip'
+#Apache_Jmeter_Source: 'https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-2.9.zip'
+
+# The version of performance monitoring tool for JMeter. The is available on customs plugins of JMeter https://jmeter-plugins.org/?search=jpgc-perfmon
+
+Jmeter_perfmon_version: 'jpgc-perfmon-2.1.zip'
+
+#The source path for the perfmon plugin versio
+
+Perfmon_source: 'https://jmeter-plugins.org/files/packages/jpgc-perfmon-2.1.zip'
+
+# Public key filename.
+
+web_client_public_key_file: 'id_rsa.pub'
+
+
+
+web_client_default_root_dir: '/var/www/html'
+
+
+
+# Raspberry default credentials. The credentials are used for ths host to login. The credentials of the computer where this is running.
+web_client_rpi_username: 'ubuntu'
+web_client_rpi_password: 'Rpi64box4$'
+
+# Raspberry default hostname or web client default hostname. If Running on JMETER Test server it can be ubuntu. 
+# If executed from a RPI64box, the name will be rpi64box. Moodlebox will use pi or moodlebox. ubuntu | rpi64box | pi | moodlebox
+web_client_rpi_hostname: 'ubuntu'
+
+
+
+

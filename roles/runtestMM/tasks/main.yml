@@ -1,0 +1,109 @@
+---
+# Get config and RUN TESTS as Block
+# Do not forget the change the variables for the Block level on line 15  
+  - name: Run Tests for mm
+    vars:
+       testfile: mm
+       testfile2: mm
+       Jthroughput: "{{throughput}}"
+       Jusers: 100
+       asynctime: 11000
+       asyncpoll: 1100
+    block:
+        - name: Download {{path_to_save_jmeter_results}}/{{platform_moodle}}/{{testfile}}.links
+          get_url:
+            url: http://rpi64box.home/admin/tool/generator/cli/tests/{{testfile}}.links
+            dest: "{{path_to_save_jmeter_results}}/{{platform_moodle}}/{{testfile}}.links"
+            mode: '0644'
+          become: yes
+          become_user: "{{client_username}}"
+
+        - name: Download {{path_to_save_jmeter_results}}/{{platform_moodle}}/{{platform_moodle}}.config
+          get_url:
+            url: http://rpi64box.home/admin/tool/generator/cli/tests/{{platform_moodle}}.config
+            dest: "{{path_to_save_jmeter_results}}/{{platform_moodle}}/{{platform_moodle}}.config"
+            mode: '0644'
+          become: yes
+          become_user: "{{client_username}}"
+
+        - name: Read first line of {{path_to_save_jmeter_results}}/{{platform_moodle}}/{{testfile}}.links
+          shell: sed -n '1p' {{path_to_save_jmeter_results}}/{{platform_moodle}}/{{testfile}}.links
+          register: jmxcsv
+          become: yes
+          become_user: "{{client_username}}"
+          
+        - name: Create Directory and Download the .jmx and .csv
+          shell: "{{jmxcsv.stdout}}"
+          async: 45
+          poll: 3
+          become: yes
+          become_user: "{{client_username}}"
+
+        - name: Remove 3 last lines of  {{path_to_save_jmeter_results}}/{{platform_moodle}}/{{testfile}}.jmx
+          shell: "head -n -3 {{path_to_save_jmeter_results}}/{{platform_moodle}}/{{testfile}}.jmx > {{path_to_save_jmeter_results}}/{{platform_moodle}}/temp.txt ; mv {{path_to_save_jmeter_results}}/{{platform_moodle}}/temp.txt {{path_to_save_jmeter_results}}/{{platform_moodle}}/{{testfile}}.jmx"
+          become: yes
+          become_user: "{{client_username}}"
+
+# This insert could also be done using a shell cat command.
+#        - name: Insert Lines inside the {{testfile}}.jmx
+#          lineinfile:
+#            path: "{{path_to_save_jmeter_results}}/{{platform_moodle}}/{{testfile}}.jmx"
+#            line: "{{item}}"
+#          with_lines: cat /tmp/{{custom_graph}}
+#          become: yes
+#          become_user: "{{client_username}}"
+
+        - name: Concatenate the jmx file with the /etc/customgraph-{{platform_moodle}}.txt
+          shell: "mv {{path_to_save_jmeter_results}}/{{platform_moodle}}/{{testfile}}.jmx  {{path_to_save_jmeter_results}}/{{platform_moodle}}/{{testfile}}-a.jmx && cat {{path_to_save_jmeter_results}}/{{platform_moodle}}/{{testfile}}-a.jmx /tmp/customgraph-{{platform_moodle}}.txt > {{path_to_save_jmeter_results}}/{{platform_moodle}}/{{testfile}}.jmx"
+          async: 60
+          poll: 4
+          become: yes
+          become_user: "{{client_username}}"
+        
+
+        - name: Read second line of {{path_to_save_jmeter_results}}/{{platform_moodle}}/{{testfile}}.links
+          shell: sed -n '2p' {{path_to_save_jmeter_results}}/{{platform_moodle}}/{{testfile}}.links | awk '{print $1" -Jthroughput={{Jthroughput}} -Jperfile={{testfile2}}.csv.perf -Jusers={{Jusers}} " $2" "$3" "$4" "$5" "$6" {{testfile2}}.log "$8" ./result-{{testfile2}}.csv"" "$10" "$11" ./{{testfile2}}/"}'
+          register: jmetercommand
+          become: yes
+          become_user: "{{client_username}}"
+
+        - debug: msg="{{jmetercommand.stdout}}"
+         
+        - name:  Run the Jmeter command for {{testfile}}. The timeout is {{asynctime}}s with {{asyncpoll}} polls.
+          shell: "cd {{path_to_save_jmeter_results}}/{{platform_moodle}}/ && {{jmetercommand.stdout}}"
+          ignore_errors: true
+          async: "{{asynctime}}"
+          poll: "{{asyncpoll}}"
+          become: yes
+          become_user: "{{client_username}}"
+          
+        - name: Check if the {{path_to_save_jmeter_results}}/{{platform_moodle}}/{{testfile}} directory exist
+          stat:
+            path: "{{path_to_save_jmeter_results}}/{{platform_moodle}}/{{testfile}}"
+          register: fldr_status
+          become: yes
+          become_user: "{{client_username}}"
+
+        - name:  If timeout occured in previous section, the report is manually generated for {{testfile}} with the following command. cd {{path_to_save_jmeter_results}}/{{platform_moodle}}/ && mv {{path_to_save_jmeter_results}}/{{platform_moodle}}/result-{{testfile}}.csv {{path_to_save_jmeter_results}}/{{platform_moodle}}/tmp-{{testfile}}.csv && head -n -1 {{path_to_save_jmeter_results}}/{{platform_moodle}}/tmp-{{testfile}}.csv > {{path_to_save_jmeter_results}}/{{platform_moodle}}/result-{{testfile}}.csv && ~/apache-jmeter/bin/./jmeter -g ./result-{{testfile}}.csv -o ./{{testfile}}/
+          shell: "cd {{path_to_save_jmeter_results}}/{{platform_moodle}} && [ ! -d {{testfile}} ] && cd {{path_to_save_jmeter_results}}/{{platform_moodle}}/ && mv {{path_to_save_jmeter_results}}/{{platform_moodle}}/result-{{testfile}}.csv {{path_to_save_jmeter_results}}/{{platform_moodle}}/tmp-{{testfile}}.csv && head -n -1 {{path_to_save_jmeter_results}}/{{platform_moodle}}/tmp-{{testfile}}.csv > {{path_to_save_jmeter_results}}/{{platform_moodle}}/result-{{testfile}}.csv && ~/apache-jmeter/bin/./jmeter -g ./result-{{testfile}}.csv -o ./{{testfile}}/"
+          async: 300
+          poll: 10
+          become: yes
+          become_user: "{{client_username}}"
+          when: not fldr_status.stat.exists
+
+
+
+        - name:  Publish contents to web server http://{{client_ip_address}}/{{jmeter_results_folder}}/{{platform_moodle}}/{{testfile}}/
+          shell: "sudo cp -rf {{path_to_save_jmeter_results}}/{{platform_moodle}}/*{{testfile}}* /var/www/html/{{jmeter_results_folder}}/{{platform_moodle}}/"
+          async: 300
+          poll: 6
+          become: yes
+          become_user: "{{client_username}}"
+          
+        - name:  Copy config file to web server http://{{client_ip_address}}/{{jmeter_results_folder}}/{{platform_moodle}}/{{platform_moodle}}.config
+          shell: "sudo cp -rf {{path_to_save_jmeter_results}}/{{platform_moodle}}/{{platform_moodle}}.config /var/www/html/{{jmeter_results_folder}}/{{platform_moodle}}/"
+          async: 300
+          poll: 10
+          become: yes
+          become_user: "{{client_username}}"

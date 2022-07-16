@@ -1,0 +1,10 @@
+---
+
+web_client_install_packages:
+  - openjdk-11-jdk-headless
+  - sysstat
+  - hwinfo
+  - mysqltuner
+  - unzip
+  - screen
+  - apache2

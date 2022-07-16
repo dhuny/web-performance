@@ -1,0 +1,32 @@
+---
+# This script creates a customgraph text in /tmp for further use by the tests
+# Do not forget the change the variables for the Block level on line 15
+  - name: Create folder if not exist {{path_to_save_jmeter_results}}/{{platform_moodle}}
+    shell: "mkdir -p {{path_to_save_jmeter_results}}/{{platform_moodle}}"
+    become: yes
+    become_user: "{{client_username}}"
+
+  - name: Create folder if not exist /var/www/html/jmetertests/{{platform_moodle}}
+    shell: "mkdir -p /var/www/html/jmetertests/{{platform_moodle}}"
+
+
+  - name: copy customgraph.txt from tmp to /tmp
+    copy:
+      src: customgraph.txt
+      dest: '/tmp'
+      mode: '0644'
+
+  - name: create a second copy of the customgraph as tmp/customgraph-{{platform_moodle}}.txt
+    shell: sudo cp /tmp/customgraph.txt /tmp/customgraph-{{platform_moodle}}.txt
+
+  - name: Replace the server.hostname variable by {{server_hostname}} in tmp/customgraph-{{platform_moodle}}.txt 
+    shell: sed -i 's/server.hostname/{{server_hostname}}/g' /tmp/customgraph-{{platform_moodle}}.txt
+
+  - name: Replace the type_of_disk_storage variable by {{storage_device}} in /tmp/customgraph-{{platform_moodle}}.txt
+    shell: sed -i 's/type_of_disk_storage/{{storage_device}}/g' /tmp/customgraph-{{platform_moodle}}.txt
+
+  - name: Replace the network_connection_type variable by {{network_type}} in /tmp/customgraph-{{platform_moodle}}.txt
+    shell: sed -i 's/network_connection_type/{{network_type}}/g' /tmp/customgraph-{{platform_moodle}}.txt
+
+  - name: Replace the network_tx_max variable by {{storage_device}} in /tmp/customgraph-{{platform_moodle}}.txt
+    shell: sed -i 's/network_tx_max/{{net_tx_max}}/g' /tmp/customgraph-{{platform_moodle}}.txt

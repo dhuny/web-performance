@@ -1,0 +1,38 @@
+---
+# Get config and RUN TESTS as Block
+# Do not forget the change the variables for the Block level on line 15
+
+  - name: Install GPIO PINS
+    shell: cd /tmp && wget https://project-downloads.drogon.net/wiringpi-latest.deb && sudo dpkg -i wiringpi-latest.deb
+    register: gpioinstall
+    async: 100
+    poll: 3
+    become: yes
+    become_user: moodlebox
+
+  - name: Set the Moodle password generator for Moodle. Debug Mode will have to be enabled manually.
+    shell: echo "\$CFG->tool_generator_users_password = 'moodle';" >> /var/www/moodle/config.php
+    become: yes
+    become_user: moodlebox
+      
+  - name: copy fanFullSpeed
+    copy:
+      src: fanFullSpeed
+      dest: '/home/moodlebox'
+      mode: '0744'
+    become: yes
+    become_user: moodlebox
+
+  - name: copy fanOn
+    copy:
+      src: fanOn
+      dest: '/home/moodlebox'
+      mode: '0744'
+    become: yes
+    become_user: moodlebox
+
+  - name: copy fanOn.service to systemd
+    copy:
+      src: fanOn.service
+      dest: '/etc/systemd/system'
+      mode: '0744'

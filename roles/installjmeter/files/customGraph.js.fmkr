@@ -1,0 +1,217 @@
+/*
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+
+    
+$(document).ready(function() {
+    $(".click-title").mouseenter( function(    e){
+        e.preventDefault();
+        this.style.cursor="pointer";
+    });
+    $(".click-title").mousedown( function(event){
+        event.preventDefault();
+    });
+    
+    <#list customsGraphsData?keys as key> 
+     try{
+	
+	////////////////////////////  Query for temperature
+				var path = ${testFile!""};
+				path = "../../../"+path;
+				path = path.replace("result-", "");
+				path = '"'+path+'.perf"';
+			 
+			
+			alasql.promise('SELECT  timeStamp,elapsed,label FROM CSV('+path+',{headers:true}) where ((timeStamp like "%0")  or (timeStamp like "%1") or (timeStamp like "%2") or (timeStamp like "%9"))',[]).then(function(res){
+		//console.log("path: "+path);
+        var data2 = {items:res};
+		var data2 = Object.values(data2.items);
+		var granularity = 2;  // defines the number of markers to add on a query.
+		
+		//----------------------------//
+		let cpuTemperature = Object.values(data2.filter(temperature => temperature.label == "rpi64box.home EXEC Temp"));
+		var temperature  = cpuTemperature.map(function (cput) {return [cput.timeStamp,(cput.elapsed/1000)];});
+        // Code below filters the results and select one every granularity. ie. every 50.
+		temperature = temperature.filter(function(value, index, Arr) {return index % granularity == 0;});
+		//console.log('t '+temperature);
+		
+		let percentageCPU = Object.values(data2.filter(cpu => cpu.label == "rpi64box.home CPU CPU"));
+		var cpu  = percentageCPU.map(function (cpuUse) {return [cpuUse.timeStamp,(cpuUse.elapsed/1000)];});
+		// Code below filters the results and select one every granularity. ie. every 50.
+		cpu = cpu.filter(function(value, index, Arr) {return index % granularity == 0;});
+		//console.log('cpu '+cpu);
+
+		let percentageMemory = Object.values(data2.filter(cpu => cpu.label == "rpi64box.home EXEC Mem"));
+		var mem  = percentageMemory.map(function (memUse) {return [memUse.timeStamp,(memUse.elapsed/1000)];});
+		// Code below filters the results and select one every granularity. ie. every 50.
+		mem = mem.filter(function(value, index, Arr) {return index % granularity == 0;});
+		//console.log('mem '+mem);
+		
+		let percentageDisk = Object.values(data2.filter(cpu => cpu.label == "rpi64box.home EXEC disk-Util"));
+		var disk  = percentageDisk.map(function (diskUse) {return [diskUse.timeStamp,(diskUse.elapsed/1000)];});
+		// Code below filters the results and select one every granularity. ie. every 50.
+		disk = disk.filter(function(value, index, Arr) {return index % granularity == 0;});
+		//console.log('disk '+disk);
+		
+		let percentageNet = Object.values(data2.filter(cpu => cpu.label == "rpi64box.home EXEC net-tx"));
+		var net  = percentageNet.map(function (netUse) {return [netUse.timeStamp,(netUse.elapsed/1000)];});
+		// Code below filters the results and select one every granularity. ie. every 50.
+		net = net.filter(function(value, index, Arr) {return index % granularity == 0;});
+		console.log('net '+net);
+		//----------------------------//
+		
+        refresh${key}(true,temperature,cpu,mem,disk,net); // function modified
+		
+		}).catch(function(reason){
+	console.log('Error:',reason)
+})
+
+
+    } catch(e){
+        console.log(e);
+    }<#break> <#-- Stop after the first iteration in purpose to show the first graph only -->
+    </#list>
+    
+    $(".portlet-header").css("cursor", "auto");
+});
+
+<#list customsGraphsData?keys as key>
+var response${key}Infos = {
+    data: {"result": {"minY": 355.61267605633776, "minX": 1.60242168E12, "maxY": 320110.8, "series": [{"data": [[1602683179134, 43]], "isOverall": false, "label": "CPU Temperature", "isController": false},{"data": [[1602683179134, 35]], "isOverall": false, "label": "CPU Usage", "isController": false},{"data": [[1602683179134, 35]], "isOverall": false, "label": "RAM Memory Usage", "isController": false},{"data": [[1602683179134, 35]], "isOverall": false, "label": "Disk Usage", "isController": false},{"data": [[1602683179134, 35]], "isOverall": false, "label": "Network Transmission", "isController": false}], "supportsControllersDiscrimination": false, "granularity": 60000, "maxX": 1.60242348E12, "title": "CPU Temperature / CPU & Memory Usage", "X_Axis": null, "sample_Metric_Name": "elapsed", "Y_Axis": "Temperature", "content_Message": "CPU Temp"}},
+    getOptions: function(){
+        return {
+            series: {
+                lines: {
+                    show: true
+                },
+                points: {
+                    show: true
+                }
+            },
+            xaxis: {
+                mode: "time",
+                timeformat: getTimeFormat(this.data.result.granularity),
+                axisLabel: 'Time (Day  HH:MM) - Granularity (30s - 1min) ',
+                axisLabelUseCanvas: true,
+                axisLabelFontSizePixels: 12,
+                axisLabelFontFamily: 'Verdana, Arial',
+                axisLabelPadding: 20,
+            },
+            yaxis: {
+                axisLabel: 'Temp. (Centigrade) / Percentage CPU, Disk & Memory Usage',
+                axisLabelUseCanvas: true,
+                axisLabelFontSizePixels: 12,
+                axisLabelFontFamily: 'Verdana, Arial',
+                axisLabelPadding: 20,
+            },
+            legend: {
+                noColumns: 2,
+                show: true,
+                container: '#legendResponse${key}'
+            },
+            selection: {
+                mode: 'xy'
+            },
+            grid: {
+                hoverable: true // IMPORTANT! this is needed for tooltip to
+                                // work
+            },
+            tooltip: true,
+            tooltipOpts: {
+                content: "%s : at %x ${graphConfigurations[key].getProperties()["setContentMessage"]!"value is"} %y"
+            }
+        };
+    },
+    createGraph: function() {
+        var data = this.data;
+        var dataset = prepareData(data.result.series, $("#choicesResponse${key}"));
+        var options = this.getOptions();
+        prepareOptions(options, data);
+        $.plot($("#flotResponse${key}"), dataset, options);
+        // setup overview
+        $.plot($("#overviewResponse${key}"), dataset, prepareOverviewOptions(options));
+    }
+};
+
+// Response Custom Graph
+function refresh${key}(fixTimestamps,cputemp,cpuusage,memusage,diskusage,netusage) {
+    var infos = response${key}Infos;
+	infos.data.result.series[0].data = cputemp; // This line assigns the graph
+	infos.data.result.series[1].data = cpuusage;
+	infos.data.result.series[2].data = memusage;
+	infos.data.result.series[3].data = diskusage;
+	infos.data.result.series[4].data = netusage;
+    prepareSeries(infos.data);
+    if(fixTimestamps) {
+        fixTimeStamps(infos.data.result.series, ${(timeZoneOffset?c)!0});
+    }
+    if(isGraph($("#flotResponse${key}"))){
+        infos.createGraph();
+    }else{
+        var choiceContainer = $("#choicesResponse${key}");
+        createLegend(choiceContainer, infos);
+        infos.createGraph();
+        setGraphZoomable("#flotResponse${key}", "#overviewResponse${key}");
+        $('#footerResponse${key} .legendColorBox > div').each(function(i){
+            $(this).clone().prependTo(choiceContainer.find("li").eq(i));
+        });
+    }
+};
+    </#list>
+
+function collapse(elem, collapsed){
+    if(collapsed){
+        $(elem).parent().find(".fa-chevron-up").removeClass("fa-chevron-up").addClass("fa-chevron-down");
+    }else{
+        $(elem).parent().find(".fa-chevron-down").removeClass("fa-chevron-down").addClass("fa-chevron-up");
+    
+    <#assign loopCount = 0>
+    <#list customsGraphsData?keys as key>
+    <#if loopCount == 0>
+    if(elem.id == "bodyResponse${key}"){
+    <#else>
+    else if(elem.id == "bodyResponse${key}"){
+    </#if>
+        if (isGraph($(elem).find('.flot-chart-content')) == false) {
+            refresh${key}(true);
+        }
+            document.location.href="#${key}";
+        }
+    </#list>
+    }
+}
+
+function toggleAll(id, checked){
+    var placeholder = document.getElementById(id);
+    var cases = $(placeholder).find(':checkbox');
+    cases.prop('checked', checked);
+    $(cases).parent().children().children().toggleClass("legend-disabled", !checked);
+    var choiceContainer;
+    
+    <#assign loopCount = 0>
+    <#list customsGraphsData?keys as key>
+    <#if loopCount == 0>
+    if(id == "choicesResponse${key}"){
+    <#else>
+    else if(id == "choicesResponse${key}"){
+    </#if>
+        choiceContainer = $("#choicesResponse${key}");
+        refresh${key}(false);
+    }
+    <#assign loopCount++>    
+    </#list>
+}

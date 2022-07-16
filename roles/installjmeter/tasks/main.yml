@@ -1,0 +1,84 @@
+---
+# This script will download Apache JMeter from apache web directory and perform an install.
+
+  - name: copy customGraph.js.fmkr from tmp to /tmp
+    copy:
+      src: customGraph.js.fmkr
+      dest: '/tmp'
+      mode: '0644'
+
+  - name: copy CustomsGraphs.html.fmkr from tmp to /tmp
+    copy:
+      src: CustomsGraphs.html.fmkr
+      dest: '/tmp'
+      mode: '0644'
+
+  - name: copy user.properties from tmp to /tmp
+    copy:
+      src: user.properties
+      dest: '/tmp'
+      mode: '0644'
+
+  - name: Get inside home directory and download the zipped {{Apache_Jmeter_Version}}
+    shell: cd ~ && wget  {{Apache_Jmeter_Source}}
+    async: 180
+    poll: 9
+    become: yes
+    become_user: "{{client_username}}"
+
+  - name: Get inside home directory and extract the {{Apache_Jmeter_Version}}.zip
+    shell: cd ~ && unzip  {{Apache_Jmeter_Version}}.zip
+    async: 180
+    poll: 9
+    become: yes
+    become_user: "{{client_username}}"
+ 
+  - name: Move  customGraph.js.fmkr to customGraph.js.fmkrOLD ~/{{Apache_Jmeter_Version}}/bin/report-template/content/js/
+    shell: "mv ~/{{Apache_Jmeter_Version}}/bin/report-template/content/js/customGraph.js.fmkr ~/{{Apache_Jmeter_Version}}/bin/report-template/content/js/customGraph.js.fmkrOLD"
+    become: yes
+    become_user: "{{client_username}}"
+
+  - name: Move  CustomsGraphs.html.fmkr to CustomsGraphs.html.fmkrOLD ~/{{Apache_Jmeter_Version}}/bin/report-template/content/pages/
+    shell: "mv ~/{{Apache_Jmeter_Version}}/bin/report-template/content/pages/CustomsGraphs.html.fmkr ~/{{Apache_Jmeter_Version}}/bin/report-template/content/pages/CustomsGraphs.html.fmkrOLD"
+    become: yes
+    become_user: "{{client_username}}"
+ 
+  - name: Move  user.properties to user.propertiesOLD ~/{{Apache_Jmeter_Version}}/bin/
+    shell: "mv ~/{{Apache_Jmeter_Version}}/bin/user.properties ~/{{Apache_Jmeter_Version}}/bin/user.properties.OLD"
+    become: yes
+    become_user: "{{client_username}}"
+
+  - name: Copy  customGraph.js.fmkr from /tmp to ~/{{Apache_Jmeter_Version}}/bin/report-template/content/js/
+    shell: "cp /tmp/customGraph.js.fmkr ~/{{Apache_Jmeter_Version}}/bin/report-template/content/js/customGraph.js.fmkr"
+    become: yes
+    become_user: "{{client_username}}"
+    
+  - name: Copy  user.properties from /tmp to ~/{{Apache_Jmeter_Version}}/bin/
+    shell: "cp /tmp/user.properties ~/{{Apache_Jmeter_Version}}/bin/user.properties"
+    become: yes
+    become_user: "{{client_username}}"
+
+  - name: Copy  CustomsGraphs.html.fmkr from /tmp to ~/{{Apache_Jmeter_Version}}/bin/report-template/content/pages/
+    shell: "cp /tmp/CustomsGraphs.html.fmkr ~/{{Apache_Jmeter_Version}}/bin/report-template/content/pages/CustomsGraphs.html.fmkr"
+    become: yes
+    become_user: "{{client_username}}"
+
+
+  - name: Set a Soft link apache-jmeter to  {{Apache_Jmeter_Version}} with ln -s {{Apache_Jmeter_Version}} apache-jmeter
+    shell: "[ ! -L ~/apache-jmeter ] && ln -s ~/{{Apache_Jmeter_Version}} ~/apache-jmeter"
+    become: yes
+    become_user: "{{client_username}}"
+    
+  - name: Get inside home directory/{{Apache_Jmeter_Version}} and download the zipped {{Jmeter_perfmon_version}}
+    shell: cd ~/{{Apache_Jmeter_Version}}/ && wget  {{Perfmon_source}}
+    async: 180
+    poll: 9
+    become: yes
+    become_user: "{{client_username}}"
+
+  - name: Get inside home directory/{{Apache_Jmeter_Version}} and extract the {{Jmeter_perfmon_version}} plugin
+    shell: cd ~/{{Apache_Jmeter_Version}}/ && unzip  {{Jmeter_perfmon_version}}
+    async: 180
+    poll: 9
+    become: yes
+    become_user: "{{client_username}}"
