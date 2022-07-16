@@ -56,7 +56,7 @@ Create an `ssh.txt` file on the `boot` partition, e.g. using
 
 12. Copy the public key to the folder web-performance under the name `id_rsa.pub`.
 
-		sudo cp ~/.ssh/id_rsa.pub ~/web-performance/keys/
+		cp ~/.ssh/id_rsa.pub ~/web-performance/keys/
 
 13. Get the IP address of the client computer using `ifconfig` or `ip a` and update it in the `web-performance/hosts.yml` file with 
 
