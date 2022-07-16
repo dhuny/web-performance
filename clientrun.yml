@@ -38,7 +38,7 @@
      - runtestXX
      - resetdbss
      - runtestSS
-     - resetdbss
+     - resetdbsm
      - runtestSM
      - resetdbmm
      - runtestM3
