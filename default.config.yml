@@ -93,6 +93,10 @@ web_client_rpi_password: 'Rpi64box4$'
 # If executed from a RPI64box, the name will be rpi64box. Moodlebox will use pi or moodlebox. ubuntu | rpi64box | pi | moodlebox
 web_client_rpi_hostname: 'ubuntu'
 
+# An additional wait time between tests to all allow hardware to recover from previous tests.
+# The default used was 0s and the maximum can be 500s. Even with 0s, The system automatically waits for 2 minutes between tests.
+sleep: '0s'
+
 
 
 
