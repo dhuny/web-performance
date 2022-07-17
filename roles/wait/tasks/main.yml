@@ -1,0 +1,7 @@
+---
+# Wait for the specified time before running new tests
+  
+- name: sleep for {{sleep}} more, before moving to next test
+  shell: 'sleep {{sleep}}'
+  async: 500
+  poll: 50
