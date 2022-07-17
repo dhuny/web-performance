@@ -37,23 +37,33 @@
      - resetdbxx
      - runtestXX
      - resetdbss
+     - wait
      - runtestSS
      - resetdbsm
+     - wait
      - runtestSM
      - resetdbmm
+     - wait
      - runtestM3
      - resetdbmm
+     - wait
      - runtestM4
      - resetdbmm
+     - wait
      - runtestM5
      - resetdbmm
+     - wait
      - runtestM6
      - resetdbmm
+     - wait
      - runtestM7
      - resetdbmm
+     - wait
      - runtestM8
-     - resetdbmm   
+     - resetdbmm
+     - wait
      - runtestM9
      - resetdbmm
+     - wait
      - runtestMM
 
