@@ -9,7 +9,7 @@ server_hostname: 'rpi64box.home'
 # Server disk storage system
 # Type of disk storage used by server. If SD-card used mmcblk and if ssd use sda.
 
-storage_device: 'sda'
+storage_device: 'mmcblk'
 
 
 # Moodlebox test Operating system
@@ -17,7 +17,7 @@ storage_device: 'sda'
 # Mains  pi-32-SD |  pi-32-SSD | pi-64-SSD | ubuntu-64-SSD | ubuntu-64-SSD-Apache
 # Maintain same value as in configuration present on Server (RPI64Box)
 
-platform_moodle: 'ubuntu-64-SSD'
+platform_moodle: 'ubuntu-64-SD'
 
 # custom graph is set for MMCblock or SDA. The values are:  customgraph.txt | customgraph-sda.txt
 # If you are running the codes from SD card use customgraph.txt else use the sda one.
