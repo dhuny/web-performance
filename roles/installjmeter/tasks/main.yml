@@ -21,8 +21,8 @@
 
   - name: Get inside home directory and download the zipped {{Apache_Jmeter_Version}}
     shell: cd ~ && wget  {{Apache_Jmeter_Source}}
-    async: 180
-    poll: 9
+    async: 360
+    poll: 18
     become: yes
     become_user: "{{client_username}}"
 
