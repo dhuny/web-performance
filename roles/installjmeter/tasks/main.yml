@@ -28,8 +28,8 @@
 
   - name: Get inside home directory and extract the {{Apache_Jmeter_Version}}.zip
     shell: cd ~ && unzip  {{Apache_Jmeter_Version}}.zip
-    async: 180
-    poll: 9
+    async: 360
+    poll: 18
     become: yes
     become_user: "{{client_username}}"
  
