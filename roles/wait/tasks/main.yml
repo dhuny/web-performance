@@ -5,3 +5,10 @@
   shell: 'sleep {{sleep}}'
   async: 500
   poll: 50
+  
+- name: Delete temporary java files inside ~/jmetertests/
+  shell: 'rm -rf ~/jmetertests/java_pid*hprof'
+  async: 30
+  poll: 3
+  become: yes
+  become_user: "{{client_username}}"
