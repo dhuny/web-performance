@@ -7,7 +7,7 @@
   poll: 50
   
 - name: Delete temporary java files inside ~/jmetertests/
-  shell: 'rm -rf ~/jmetertests/java_pid*hprof'
+  shell: 'rm -rf ~/jmetertests/{{platform_moodle}}/java_pid*hprof'
   async: 30
   poll: 3
   become: yes
